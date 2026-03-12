@@ -1,0 +1,42 @@
+body{
+background:#0b0f14;
+color:#00ffc3;
+font-family:'JetBrains Mono', monospace;
+text-align:center;
+}
+
+h1{
+margin-top:20px;
+letter-spacing:2px;
+}
+
+.game-container{
+display:flex;
+justify-content:center;
+margin-top:20px;
+}
+
+.components{
+width:200px;
+border-right:1px solid #00ffc3;
+padding:10px;
+}
+
+.component{
+background:#111822;
+margin:10px;
+padding:10px;
+cursor:grab;
+border:1px solid #00ffc3;
+}
+
+canvas{
+background:#0f1621;
+margin-left:20px;
+border:2px solid #00ffc3;
+}
+
+.status{
+margin-top:20px;
+font-size:18px;
+}
