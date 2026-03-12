@@ -1,117 +1,174 @@
-const canvas = document.getElementById("board")
+const canvas = document.getElementById("gameCanvas")
 const ctx = canvas.getContext("2d")
 
-let components = []
+canvas.width = 900
+canvas.height = 500
+
+let nodes = []
 let wires = []
+let startNode = null
 
-let selected = null
+const voltage = 12
+let current = 0
 
-document.querySelectorAll(".component").forEach(comp => {
+class Node{
 
-comp.addEventListener("dragstart", e=>{
-e.dataTransfer.setData("type", comp.dataset.type)
-})
+constructor(x,y,type){
 
-})
+this.x=x
+this.y=y
+this.type=type
+this.radius=10
 
-canvas.addEventListener("dragover", e=>{
-e.preventDefault()
-})
-
-canvas.addEventListener("drop", e=>{
-
-const type = e.dataTransfer.getData("type")
-
-const rect = canvas.getBoundingClientRect()
-
-components.push({
-type:type,
-x:e.clientX-rect.left,
-y:e.clientY-rect.top
-})
-
-draw()
-
-})
-
-canvas.addEventListener("click", e=>{
-
-const rect = canvas.getBoundingClientRect()
-const x = e.clientX - rect.left
-const y = e.clientY - rect.top
-
-let hit = components.find(c =>
-Math.abs(c.x-x)<20 && Math.abs(c.y-y)<20)
-
-if(hit){
-
-if(selected==null){
-selected=hit
 }
-else{
 
-wires.push([selected,hit])
-selected=null
-checkCircuit()
+draw(){
+
+ctx.beginPath()
+
+if(this.type=="battery")
+ctx.fillStyle="#ff5555"
+
+else if(this.type=="bulb")
+ctx.fillStyle="#ffff55"
+
+else
+ctx.fillStyle="#00ffcc"
+
+ctx.arc(this.x,this.y,this.radius,0,Math.PI*2)
+ctx.fill()
+
 }
 
 }
 
-draw()
+function createLevel(){
 
-})
+nodes=[]
+
+nodes.push(new Node(100,250,"battery"))
+
+nodes.push(new Node(400,150,"junction"))
+nodes.push(new Node(400,350,"junction"))
+
+nodes.push(new Node(700,250,"bulb"))
+
+}
 
 function draw(){
 
 ctx.clearRect(0,0,canvas.width,canvas.height)
 
-components.forEach(c=>{
+nodes.forEach(n=>n.draw())
 
-ctx.fillStyle="#00ffc3"
-ctx.beginPath()
-ctx.arc(c.x,c.y,15,0,Math.PI*2)
-ctx.fill()
-
-ctx.fillStyle="#000"
-ctx.fillText(c.type,c.x-15,c.y+30)
-
-})
-
-ctx.strokeStyle="#00ffc3"
-ctx.lineWidth=2
+ctx.strokeStyle="#00ffcc"
 
 wires.forEach(w=>{
-
 ctx.beginPath()
-ctx.moveTo(w[0].x,w[0].y)
-ctx.lineTo(w[1].x,w[1].y)
+ctx.moveTo(w.x1,w.y1)
+ctx.lineTo(w.x2,w.y2)
 ctx.stroke()
-
 })
 
 }
+
+canvas.addEventListener("mousedown",e=>{
+
+const rect = canvas.getBoundingClientRect()
+
+const mx = e.clientX-rect.left
+const my = e.clientY-rect.top
+
+nodes.forEach(n=>{
+
+const dist = Math.hypot(mx-n.x,my-n.y)
+
+if(dist<15){
+
+startNode=n
+
+}
+
+})
+
+})
+
+canvas.addEventListener("mouseup",e=>{
+
+if(!startNode) return
+
+const rect = canvas.getBoundingClientRect()
+
+const mx = e.clientX-rect.left
+const my = e.clientY-rect.top
+
+nodes.forEach(n=>{
+
+const dist = Math.hypot(mx-n.x,my-n.y)
+
+if(dist<15 && n!==startNode){
+
+wires.push({
+x1:startNode.x,
+y1:startNode.y,
+x2:n.x,
+y2:n.y
+})
+
+checkCircuit()
+
+}
+
+})
+
+startNode=null
+
+})
 
 function checkCircuit(){
 
-let types = components.map(c=>c.type)
+let battery=false
+let bulb=false
 
-if(
-types.includes("battery") &&
-types.includes("switch") &&
-types.includes("resistor") &&
-types.includes("lamp") &&
-wires.length>=3
-){
+wires.forEach(w=>{
 
-document.getElementById("result").innerText="ไฟติดแล้ว ⚡💡"
-document.getElementById("result").style.color="yellow"
+nodes.forEach(n=>{
+
+if(n.type=="battery") battery=true
+if(n.type=="bulb") bulb=true
+
+})
+
+})
+
+if(battery && bulb){
+
+current = voltage / 10
+
+document.getElementById("current").innerText=current
+
+alert("⚡ วงจรสมบูรณ์ หลอดไฟติด!")
 
 }
-else{
-
-document.getElementById("result").innerText="วงจรยังไม่ถูกต้อง"
-document.getElementById("result").style.color="red"
 
 }
 
+function resetGame(){
+
+wires=[]
+current=0
+
+document.getElementById("current").innerText=0
+
 }
+
+function gameLoop(){
+
+draw()
+requestAnimationFrame(gameLoop)
+
+}
+
+createLevel()
+
+gameLoop()
