@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>ต่อไฟฟ้าประทังชีวิตเด็กปากคลอง</title>
+<link rel="stylesheet" href="style.css">
+
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;500&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+<h1>⚡ ต่อไฟฟ้าประทังชีวิตเด็กปากคลอง</h1>
+
+<div class="game-container">
+
+<div class="components">
+
+<div class="component" draggable="true" data-type="battery">🔋 Battery</div>
+<div class="component" draggable="true" data-type="switch">🎚 Switch</div>
+<div class="component" draggable="true" data-type="resistor">🟫 Resistor</div>
+<div class="component" draggable="true" data-type="lamp">💡 Lamp</div>
+
+</div>
+
+<canvas id="board" width="900" height="500"></canvas>
+
+</div>
+
+<div class="status">
+สถานะวงจร: <span id="result">ยังไม่ครบวงจร</span>
+</div>
+
+<script src="game.js"></script>
+
+</body>
+</html>
